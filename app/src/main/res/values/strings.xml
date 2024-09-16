@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">ContextMonitoringApp</string>
+    <string name="app_name_better">Health App</string>
+    <string name="stop_capture">Stop Capture</string>
+    <string name="start_capture">Heart Rate</string>
+    <string name="Breathe">Breathe</string>
+    <string name="Heart">Heart</string>
+    <string name="Next">Next</string>
+    <string name="initheart">H: 0</string>
+    <string name="initresp">R: 0</string>
+    <string name="symptoms">SYMPTOMS</string>
+    <string name="submit">Submit</string>
+    <string name="muscle_ache">Muscle Ache</string>
+    <string name="feeling_tired">Feeling Tired</string>
+    <string name="nausea">Nausea</string>
+    <string name="headache">Headache</string>
+    <string name="diarrhea">Diarrhea</string>
+    <string name="sore_throat">Sore Throat</string>
+    <string name="fever">Fever</string>
+    <string name="cough">Cough</string>
+    <string name="loss_of_smell_or_taste">Loss of Smell or Taste</string>
+    <string name="shortness_of_breath">Shortness of Breath</string>
+    <string name="clear">Clear</string>
+</resources>
