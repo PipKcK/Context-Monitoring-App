@@ -202,31 +202,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun stopRespiratoryRateSensing() {
         // Unregister the listener to stop sensing
         sensorManager.unregisterListener(this)
-        viewBinding.textViewStatus.text = "Health App" // Show calculating status
+
+        // Calculate the respiratory rate using the accumulated data
+        val respiratoryRate = respiratoryRateCalculator(accelValuesX, accelValuesY, accelValuesZ)
+        setRespiratory(respiratoryRate)
+
+        // Show the respiratory rate
+        viewBinding.textViewRespiratory.text = "Respiratory Rate: $respiratoryRate"
+
+        // Clear the sensor data after calculation
+        accelValuesX.clear()
+        accelValuesY.clear()
+        accelValuesZ.clear()
+
+        viewBinding.textViewStatus.text = "Health App" // Reset status text
         viewBinding.buttonNext.visibility = android.view.View.VISIBLE // Show the save button
     }
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            // Accumulate accelerometer data for 45 seconds
             accelValuesX.add(event.values[0])
             accelValuesY.add(event.values[1])
             accelValuesZ.add(event.values[2])
-
-            if (accelValuesY.size >= 50) {
-                val respiratoryRate = respiratoryRateCalculator(accelValuesX, accelValuesY, accelValuesZ)
-                setRespiratory(respiratoryRate)
-                // Show the respiratory rate
-                viewBinding.textViewRespiratory.text = "Respiratory Rate: $respiratoryRate"
-                checkR = 1
-                if(checkH * checkR == 1){
-                    viewBinding.buttonNext.visibility = android.view.View.VISIBLE
-                }
-
-                // Clear the sensor data
-                accelValuesX.clear()
-                accelValuesY.clear()
-                accelValuesZ.clear()
-            }
         }
     }
 
