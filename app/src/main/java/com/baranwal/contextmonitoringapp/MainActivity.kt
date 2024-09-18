@@ -98,9 +98,6 @@ import kotlin.math.min
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
-    private var checkH: Int = 0
-    private var checkR: Int = 0
-
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
 
@@ -143,7 +140,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         viewBinding.buttonNext.setOnClickListener {
-            Toast.makeText(this, "Respiratory Rate saved!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Heart and Respiratory Rate saved!", Toast.LENGTH_SHORT).show()
             val H = getHeart()
             Log.d("Heart", "Sending Heart Rate ULALALA: $H")
             val R = getRespiratory()
@@ -162,11 +159,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             requestPermissions()
         }
 
-        // Add the toast for heart rate button
         viewBinding.buttonHeartRate.setOnClickListener {
-            viewBinding.buttonHeartRate.setOnClickListener { captureVideo() }
+            Log.e("Button", "uji Button Pressed")
+            captureVideo()
         }
     }
+
+    private val respiratoryRates = mutableListOf<Float>()
 
     private fun startRespiratoryRateSensing() {
         viewBinding.textViewStatus.text = "Calculating..." // Show calculating status
@@ -202,35 +201,40 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun stopRespiratoryRateSensing() {
         // Unregister the listener to stop sensing
         sensorManager.unregisterListener(this)
+        viewBinding.textViewStatus.text = "Health App"
+        viewBinding.buttonNext.visibility = android.view.View.VISIBLE
 
-        // Calculate the respiratory rate using the accumulated data
-        val respiratoryRate = respiratoryRateCalculator(accelValuesX, accelValuesY, accelValuesZ)
-        setRespiratory(respiratoryRate)
+        // Calculate the average respiratory rate
+        val ARespiratoryRate = respiratoryRates.average().toInt()
+        viewBinding.textViewRespiratory.text = "Respiratory Rate: $ARespiratoryRate"
 
-        // Show the respiratory rate
-        viewBinding.textViewRespiratory.text = "Respiratory Rate: $respiratoryRate"
-
-        // Clear the sensor data after calculation
-        accelValuesX.clear()
-        accelValuesY.clear()
-        accelValuesZ.clear()
-
-        viewBinding.textViewStatus.text = "Health App" // Reset status text
-        viewBinding.buttonNext.visibility = android.view.View.VISIBLE // Show the save button
+        // Clear the respiratory rates list
+        respiratoryRates.clear()
     }
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            // Accumulate accelerometer data for 45 seconds
             accelValuesX.add(event.values[0])
             accelValuesY.add(event.values[1])
             accelValuesZ.add(event.values[2])
+
+            if (accelValuesY.size >= 50) {
+                val respiratoryRate = respiratoryRateCalculator(accelValuesX, accelValuesY, accelValuesZ)
+                setRespiratory(respiratoryRate)
+
+                // Add the respiratory rate to the list
+                respiratoryRates.add(respiratoryRate.toFloat())
+
+                // Clear the sensor data
+                accelValuesX.clear()
+                accelValuesY.clear()
+                accelValuesZ.clear()
+            }
         }
     }
+    //_________________________________________________
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-
-
 
     private fun respiratoryRateCalculator(
         accelValuesX: MutableList<Float>,
@@ -325,11 +329,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             lifecycleScope.launch {
                                 val heartRate = heartRateCalculator(recordEvent.outputResults.outputUri, contentResolver)
                                 setHeart(heartRate)
+                                viewBinding.buttonNext.visibility = android.view.View.VISIBLE
+
                                 viewBinding.textViewHeart.text = "Heart Rate: $heartRate"
-                                checkH = 1
-                                if(checkH * checkR == 1){
-                                    viewBinding.buttonNext.visibility = android.view.View.VISIBLE
-                                }
+
                                 viewBinding.textViewStatus.text = "Health App" // Show calculating status
                             }
                         } else {
