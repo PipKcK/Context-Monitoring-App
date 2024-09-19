@@ -205,8 +205,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         viewBinding.buttonNext.visibility = android.view.View.VISIBLE
 
         // Calculate the average respiratory rate
-        val ARespiratoryRate = respiratoryRates.average().toInt()
-        viewBinding.textViewRespiratory.text = "Respiratory Rate: $ARespiratoryRate"
+        val aRespiratoryRate = respiratoryRates.average().toInt()
+        setRespiratory(aRespiratoryRate)
+        viewBinding.textViewRespiratory.text = "Respiratory Rate: $aRespiratoryRate"
 
         // Clear the respiratory rates list
         respiratoryRates.clear()
@@ -220,7 +221,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
             if (accelValuesY.size >= 50) {
                 val respiratoryRate = respiratoryRateCalculator(accelValuesX, accelValuesY, accelValuesZ)
-                setRespiratory(respiratoryRate)
 
                 // Add the respiratory rate to the list
                 respiratoryRates.add(respiratoryRate.toFloat())
